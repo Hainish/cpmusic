@@ -3,7 +3,11 @@ import sys
 import humanfriendly
 
 def usage():
+    print "Copy a specifically sized random selection of albums"
+    print ""
+    print "Usage:"
     print sys.argv[0] + " <size> <source> <destination>"
+    print "Assumes the source descendents directory structure is <artist>/<album>/"
 
 if __name__ == "__main__":
     if len(sys.argv) != 4:
