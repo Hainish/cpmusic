@@ -2,6 +2,8 @@
 import sys
 import os
 import humanfriendly
+import random
+import shutil
 
 def usage():
     print "Copy a specifically sized random selection of albums"
@@ -14,6 +16,7 @@ class AlbumBuilder:
     def __init__(self, source):
         self.source = source
 
+    @staticmethod
     def get_size(start_path = '.'):
         total_size = 0
         for dirpath, dirnames, filenames in os.walk(start_path):
@@ -33,6 +36,21 @@ class AlbumBuilder:
                         albums.append(album_path)
         self.selection = albums
 
+    def choose_albums(self, max_size):
+        selection = self.selection
+        current_size = 0
+        albums = []
+        while True:
+            album = random.choice(selection)
+            album_size = self.get_size(album)
+            if current_size + album_size > max_size:
+                break
+            else:
+                albums.append(album)
+                selection.remove(album)
+                current_size += album_size
+        return albums
+
 
 if __name__ == "__main__":
     if len(sys.argv) != 4:
@@ -46,3 +64,8 @@ if __name__ == "__main__":
             exit()
         builder = AlbumBuilder(sys.argv[2])
         builder.build_selection()
+        album_paths = builder.choose_albums(size)
+        for album_path in album_paths:
+            album_name = os.path.basename(album_path)
+            artist_name = os.path.basename(os.path.dirname(album_path))
+            shutil.copytree(album_path, os.path.join(sys.argv[3], artist_name, album_name))
